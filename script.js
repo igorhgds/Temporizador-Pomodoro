@@ -1,24 +1,25 @@
-const html = document.querySelector('html');
-const focoBtn = document.querySelector('.app__card-button--foco');
-const curtoBtn = document.querySelector('.app__card-button--curto');
-const longoBtn = document.querySelector('.app__card-button--longo');
-const banner = document.querySelector('.app__image');
-const titulo = document.querySelector('.app__title');
-const botoes = document.querySelectorAll('.app__card-button');
-const starPauseBtn = document.querySelector('#start-pause');
-const musicaFocoInput = document.querySelector('#alternar-musica');
-const iniciarOuPausarBtn = document.querySelector('#start-pause span')
-const iniciarOuPausarImg = document.querySelector('.app__card-primary-butto-icon');
-const tempoNaTela = document.querySelector('#timer');
+const html = document.querySelector('html')
+const focoBt = document.querySelector('.app__card-button--foco')
+const curtoBt = document.querySelector('.app__card-button--curto')
+const longoBt = document.querySelector('.app__card-button--longo')
+const banner = document.querySelector('.app__image')
+const titulo = document.querySelector('.app__title')
+const botoes = document.querySelectorAll('.app__card-button')
+const startPauseBt = document.querySelector('#start-pause')
+const musicaFocoInput = document.querySelector('#alternar-musica')
+const iniciarOuPausarBt = document.querySelector('#start-pause span')
+const iniciarOuPausarBtIcone = document.querySelector(".app__card-primary-butto-icon") 
+const tempoNaTela = document.querySelector('#timer')
 
-const musica = new Audio('./sons/luna-rise-part-one.mp3');
-const somPlay = new Audio('./sons/play.wav');
-const somPause = new Audio('./sons/pause.mp3');
-const somFinalizado = new Audio('./sons/beep.mp3');
+const musica = new Audio('./sons/luna-rise-part-one.mp3')
+const audioPlay = new Audio('./sons/play.wav');
+const audioPausa = new Audio('./sons/pause.mp3');
+const audioTempoFinalizado = new Audio('./sons/beep.mp3')
 
-let tempoDecorridoEmSegundos = 1500;
-let intervaloId = null;
-musica.loop = true;
+let tempoDecorridoEmSegundos = 30
+let intervaloId = null
+
+musica.loop = true
 
 musicaFocoInput.addEventListener('change', () => {
     if(musica.paused) {
@@ -28,56 +29,61 @@ musicaFocoInput.addEventListener('change', () => {
     }
 })
 
-focoBtn.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 1500
+focoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 30
     alterarContexto('foco')
-    focoBtn.classList.add('active')
+    focoBt.classList.add('active')
 })
 
-curtoBtn.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 300
+curtoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 5
     alterarContexto('descanso-curto')
-    curtoBtn.classList.add('active')
+    curtoBt.classList.add('active')
 })
 
-longoBtn.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 900
+longoBt.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 15
     alterarContexto('descanso-longo')
-    longoBtn.classList.add('active')
+    longoBt.classList.add('active')
 })
 
 function alterarContexto(contexto) {
     mostrarTempo()
-    botoes.forEach(function (contexto) {
+    botoes.forEach(function (contexto){
         contexto.classList.remove('active')
     })
     html.setAttribute('data-contexto', contexto)
     banner.setAttribute('src', `./imagens/${contexto}.png`)
-    switch(contexto) {
+    switch (contexto) {
         case "foco":
-            titulo.innerHTML = `Otimize sua produtividade,<br>
-                <strong class="app__title-strong">mergulhe no que importa.</strong>`
+            titulo.innerHTML = `
+            Otimize sua produtividade,<br>
+                <strong class="app__title-strong">mergulhe no que importa.</strong>
+            `
             break;
-
         case "descanso-curto":
-            titulo.innerHTML = `Que tal dar uma respirada?<br>
-                <strong class="app__title-strong">Faça uma pausa curta!.</strong>`
+            titulo.innerHTML = `
+            Que tal dar uma respirada? <strong class="app__title-strong">Faça uma pausa curta!</strong>
+            ` 
             break;
-
         case "descanso-longo":
-            titulo.innerHTML = `Hora de voltar á superfície,<br>
-                <strong class="app__title-strong">Faça uma pausa longa.</strong>`
-            break;
-
+            titulo.innerHTML = `
+            Hora de voltar à superfície.<strong class="app__title-strong"> Faça uma pausa longa.</strong>
+            `
         default:
             break;
     }
 }
 
-const contagemRegresiva = () => {
+const contagemRegressiva = () => {
     if(tempoDecorridoEmSegundos <= 0){
-        somFinalizado.play()
-        alert("Tempo Finalizado")
+        audioTempoFinalizado.play()
+        alert('Tempo finalizado!')
+        const focoAtivo = html.getAttribute('data-contexto') == 'foco'
+        if (focoAtivo) {
+            const evento = new CustomEvent('FocoFinalizado')
+            document.dispatchEvent(evento)
+        }
         zerar()
         return
     }
@@ -85,30 +91,30 @@ const contagemRegresiva = () => {
     mostrarTempo()
 }
 
-starPauseBtn.addEventListener('click', iniciarOuPausar)
+startPauseBt.addEventListener('click', iniciarOuPausar)
 
 function iniciarOuPausar() {
     if(intervaloId){
-        somPause.play();
+        audioPausa.play()
         zerar()
         return
     }
-    somPlay.play();
-    intervaloId = setInterval(contagemRegresiva, 1000)
-    iniciarOuPausarBtn.textContent = "Pausar"
-    iniciarOuPausarImg.setAttribute('src', "./imagens/pause.png")
+    audioPlay.play()
+    intervaloId = setInterval(contagemRegressiva, 1000)
+    iniciarOuPausarBt.textContent = "Pausar"
+    iniciarOuPausarBtIcone.setAttribute('src', `./imagens/pause.png`)
 }
 
 function zerar() {
-    clearInterval(intervaloId)
-    iniciarOuPausarImg.setAttribute('src', "./imagens/play_arrow.png");
-    iniciarOuPausarBtn.textContent = "Começar"
+    clearInterval(intervaloId) 
+    iniciarOuPausarBt.textContent = "Começar"
+    iniciarOuPausarBtIcone.setAttribute('src', `./imagens/play_arrow.png`)
     intervaloId = null
 }
 
-function mostrarTempo(){
+function mostrarTempo() {
     const tempo = new Date(tempoDecorridoEmSegundos * 1000)
-    const tempoFormatado = tempo.toLocaleTimeString('pt-br', {minute: '2-digit', second: '2-digit'})
+    const tempoFormatado = tempo.toLocaleTimeString('pt-Br', {minute: '2-digit', second: '2-digit'})
     tempoNaTela.innerHTML = `${tempoFormatado}`
 }
 
